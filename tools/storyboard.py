@@ -159,23 +159,26 @@ Réponds en JSON : {{"choix": <numéro>, "note": <0 à 10>}}"""}]
         return cands[0]
 
 
-def candidates_for(shot: dict, used: set[str], orientation: str) -> list[dict]:
-    pool: list[dict] = []
-    seen: set[str] = set()
+def candidates_for(shot: dict, used: set[str], orientation: str, photos_first: bool = False) -> list[dict]:
+    """5 vidéos + 3 photos ; ou, en 2e passe, surtout des photos (souvent plus précises)."""
+    vids: list[dict] = []
+    imgs: list[dict] = []
+    seen: set[str] = set(used)
+
+    def add(dst: list, items: list, limit: int) -> None:
+        for c in items:
+            if len(dst) >= limit:
+                return
+            if c["id"] not in seen:
+                dst.append(c); seen.add(c["id"])
+
+    n_vid, n_img = (3, 7) if photos_first else (5, 3)
     for q in shot["queries"]:
-        for c in pixabay("video", q, orientation)[:4]:
-            if c["id"] not in used and c["id"] not in seen:
-                pool.append(c); seen.add(c["id"])
-        if len(pool) >= 6:
-            break
-    # Les photos complètent quand les vidéos manquent ou sont peu nombreuses
-    for q in shot["queries"][:2]:
-        if len(pool) >= 8:
-            break
-        for c in pixabay("image", q, orientation)[:3]:
-            if c["id"] not in used and c["id"] not in seen:
-                pool.append(c); seen.add(c["id"])
-    return pool[:8]
+        add(imgs, pixabay("image", q, orientation)[:4], n_img)
+        if photos_first:
+            add(imgs, pixabay("image", q, "any")[:3], n_img)
+        add(vids, pixabay("video", q, orientation)[:4], n_vid)
+    return vids + imgs
 
 
 # --------------------------------------------------------------------------- Rendu
@@ -216,6 +219,13 @@ def build_shots(lines: list[str], times: list[tuple[float, float]], total: float
     return shots
 
 
+def _note(c: dict) -> float:
+    try:
+        return float(c.get("note", 0))
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("task_dir", type=Path)
@@ -250,6 +260,12 @@ def main() -> None:
     for i, sh in enumerate(shots):
         cands = candidates_for(sh, used, orientation)
         pick = choose(sh, cands, work)
+        if pick is not None and _note(pick) < 6:
+            # 2e passe : les photos sont souvent plus précises que les vidéos
+            tried = used | {c["id"] for c in cands}
+            alt = choose(sh, candidates_for(sh, tried, orientation, photos_first=True), work)
+            if alt is not None and _note(alt) > _note(pick):
+                pick = alt
         if pick is None:
             raise SystemExit(f"Aucun visuel trouvé pour : {sh['text']}")
         used.add(pick["id"])
