@@ -75,7 +75,11 @@ Pour CHAQUE plan, donne 3 recherches en ANGLAIS pour une banque de vidéos/photo
 et décrit ce qu'on doit VOIR à l'écran pendant cette phrase, concrètement
 (ex. « astronaut tears » -> « water droplet zero gravity », « astronaut face »).
 Tiens compte du contexte des phrases voisines (un « elle » désigne ce dont on parle).
-Pour l'accroche ou la conclusion, choisis une image forte liée au thème général.
+Pour l'accroche ou la conclusion (même un appel à commenter), choisis une image
+forte liée au thème général de la vidéo, jamais une illustration littérale
+(pas de clavier ni de téléphone pour « dis-le en commentaire »).
+Dans « voir », nomme toujours explicitement le sujet (ex. « la planète Vénus qui
+tourne lentement », pas « elle tourne »).
 Évite les noms propres que la banque ne connaît pas ; décris l'objet visible.
 
 Ajoute pour chaque plan une recherche de « secours » : un visuel générique du
@@ -145,6 +149,9 @@ Ce qu'on devrait voir : {shot['voir']}
 Voici {len(cands)} images candidates numérotées. Choisis celle qui illustre le
 plus exactement la phrase (sujet visible, pas juste l'ambiance). Évite le texte
 incrusté, les logos, les visages en gros plan sans rapport.
+Sois sévère dans la note : si l'image montre un AUTRE objet que celui dont parle
+la phrase (ex. la Terre au lieu de Vénus, des astéroïdes au lieu d'une étoile),
+la note est 3 au maximum. 8 et plus seulement si le sujet exact est visible.
 Réponds en JSON : {{"choix": <numéro>, "note": <0 à 10>}}"""}]
     for n, c in enumerate(cands):
         try:
