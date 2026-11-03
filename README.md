@@ -11,7 +11,7 @@ off, les sous-titres et la musique, puis sort un MP4.
 
 | Étape | Outil | Coût |
 |---|---|---|
-| Écriture du script | Google **Gemini** (`gemini-3.5-flash`) | gratuit (clé Google AI Studio) |
+| Écriture du script | Google **Gemini** (`gemini-3.5-flash-lite`) | gratuit (clé Google AI Studio) |
 | Vidéos d'illustration | **Pixabay** | gratuit (clé Pixabay) |
 | Voix off | **Gemini TTS** (Kore ou Charon) | gratuit (même clé Gemini) |
 | Montage, sous-titres, musique | **MoneyPrinterTurbo** | gratuit |
@@ -89,12 +89,26 @@ Toutes les options : `cd ~/MoneyPrinterTurbo && .venv/bin/python cli.py --help`
 Les vidéos finales sont copiées dans le dossier `videos/` de ce dépôt. Ce dossier
 est ignoré par git, pour ne pas alourdir le dépôt.
 
+## Format quiz « Vrai ou faux ? »
+
+```bash
+./quiz.sh exemples/quiz-idees-recues.json
+VOIX=Charon AMBIANCE=suspense COMPTE=5 ./quiz.sh exemples/mon-quiz.json
+```
+
+Le fichier JSON contient l'intro, les affirmations (vraies ou fausses), les
+explications et une recherche d'image de fond par question. À l'écran : titre,
+numéro de question, carte de question, boutons VRAI / FAUX, compte à rebours
+animé avec tic-tac, puis la bonne réponse mise en avant avec son explication.
+Une seule synthèse vocale par vidéo (économise le quota Gemini).
+
 ## Fichiers
 
 - `setup.sh` : installe MoneyPrinterTurbo dans `~/MoneyPrinterTurbo` et écrit sa configuration à partir des variables d'environnement. Tu peux le relancer sans risque.
 - `video.sh` : génère une vidéo à partir d'un sujet (lance `setup.sh` au besoin).
 - `tools/sync_subs.py` : cale les sous-titres sur les vraies pauses de la voix (texte identique au script).
 - `tools/storyboard.py` : montage précis, une image par phrase choisie par Gemini (qui regarde les miniatures Pixabay), coupée pile sur la voix. Désactivable avec `MONTAGE=rapide`.
+- `quiz.sh` + `tools/quiz.py` : format quiz « Vrai ou faux ? ».
 - `tools/ambiance.py` : compose une musique d'ambiance libre de droits (`suspense` ou `calme`).
 - `CLAUDE.md` : les instructions que Claude suit dans chaque nouvelle session.
 

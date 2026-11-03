@@ -32,7 +32,7 @@ import sync_subs  # noqa: E402
 
 FPS = 30
 MIN_SHOT = 1.6  # en dessous, la ligne partage le plan de la suivante
-MODELS = [os.environ.get("GEMINI_MODEL", "gemini-3.5-flash"), "gemini-3.5-flash-lite", "gemini-3.5-flash"]
+MODELS = [os.environ.get("GEMINI_MODEL", "gemini-3.5-flash-lite"), "gemini-flash-lite-latest", "gemini-3.1-flash-lite"]
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{}:generateContent"
 
 

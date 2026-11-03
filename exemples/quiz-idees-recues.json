@@ -1,0 +1,41 @@
+{
+  "titre": "VRAI OU FAUX ?",
+  "intro": "Vrai ou faux ? Cinq idées reçues que presque tout le monde croit. Réponds avant la fin du compte à rebours !",
+  "accroche_ecran": "5 idées reçues\nRéponds avant la fin du compte à rebours !",
+  "outro": "Alors, combien de bonnes réponses ? Dis-le en commentaire !",
+  "outro_ecran": "Combien de bonnes réponses ?\nDis-le en commentaire !",
+  "fond_intro": "question mark",
+  "fond_outro": "fireworks",
+  "questions": [
+    {
+      "affirmation": "La Grande Muraille de Chine est visible à l'œil nu depuis l'espace.",
+      "reponse": false,
+      "explication": "Elle est bien trop étroite : depuis l'orbite, les astronautes ne la distinguent pas à l'œil nu.",
+      "fond": "great wall china"
+    },
+    {
+      "affirmation": "Les poissons rouges ont une mémoire de trois secondes.",
+      "reponse": false,
+      "explication": "Des études montrent qu'ils peuvent retenir des informations pendant plusieurs mois.",
+      "fond": "goldfish"
+    },
+    {
+      "affirmation": "Une banane est légèrement radioactive.",
+      "reponse": true,
+      "explication": "Elle contient du potassium 40, un isotope naturellement radioactif. Mais c'est sans aucun danger.",
+      "fond": "banana fruit"
+    },
+    {
+      "affirmation": "La foudre ne tombe jamais deux fois au même endroit.",
+      "reponse": false,
+      "explication": "L'Empire State Building est frappé par la foudre environ vingt fois par an.",
+      "fond": "lightning storm"
+    },
+    {
+      "affirmation": "Les pieuvres ont trois cœurs.",
+      "reponse": true,
+      "explication": "Deux cœurs envoient le sang vers les branchies, le troisième vers le reste du corps.",
+      "fond": "octopus"
+    }
+  ]
+}

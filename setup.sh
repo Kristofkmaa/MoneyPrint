@@ -4,7 +4,7 @@
 set -euo pipefail
 
 MPT_DIR="${MPT_DIR:-$HOME/MoneyPrinterTurbo}"
-GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash}"
+GEMINI_MODEL="${GEMINI_MODEL:-gemini-3.5-flash-lite}"
 
 if [ ! -f "$MPT_DIR/cli.py" ]; then
   echo "[setup] Téléchargement de MoneyPrinterTurbo..."

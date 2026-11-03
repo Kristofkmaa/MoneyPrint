@@ -24,6 +24,18 @@ MoneyPrinterTurbo (voir README.md).
      `MONTAGE=rapide` = montage d'origine (plus rapide, moins précis).
    - Quand l'utilisateur donne des consignes précises de contenu, écris toi-même le
      texte (faits vérifiés) et passe-le avec `--video-script "..."`.
+## Quand l'utilisateur demande un quiz « Vrai ou faux ? »
+
+1. Écris toi-même un JSON sur le modèle de `exemples/quiz-idees-recues.json`
+   (dans `exemples/`) : 5 affirmations **vraies ou fausses vérifiables**, mélange
+   VRAI et FAUX, explications courtes (1 ou 2 phrases), `fond` = recherche
+   Pixabay en anglais concrète (ex. « octopus », « lightning storm »).
+2. Lance `./quiz.sh exemples/<fichier>.json` (premier plan, timeout 20 min).
+   Options : `VOIX=Charon`, `AMBIANCE=suspense|calme|aucune`, `COMPTE=5`.
+3. Envoie le fichier `VIDEO_FILE=...` avec `SendUserFile`.
+
+## Après chaque vidéo
+
 2. Récupère la ligne `VIDEO_FILE=...` et envoie le fichier à l'utilisateur
    avec `SendUserFile` (display: render).
 3. Ne commit **jamais** de vidéo ni de clé API.
@@ -33,7 +45,9 @@ MoneyPrinterTurbo (voir README.md).
 - Code de sortie 10 : `GEMINI_API_KEY` ou `PIXABAY_API_KEY` manque. Explique à
   l'utilisateur comment l'ajouter dans les variables d'environnement cloud
   (README, étape 3). Ne lui demande pas de coller la clé dans le chat.
-- Erreur 503 de Gemini : relance avec `GEMINI_MODEL=gemini-3.8-flash` (ou un autre modèle flash).
+- Quota Gemini gratuit : `gemini-3.5-flash` est limité à ~20 requêtes/jour, d'où
+  `gemini-3.5-flash-lite` par défaut (quota plus large). Erreur 429/503 : relance
+  avec `GEMINI_MODEL=gemini-flash-lite-latest` ou `gemini-3.1-flash-lite`.
 - Erreur réseau (proxy 403, connexion refusée) : identifie le domaine bloqué et
   demande à l'utilisateur de l'ajouter dans « Allowed domains » (README, étape 2).
 - En cas d'échec, lis seulement la fin du log, pas tout le log.
