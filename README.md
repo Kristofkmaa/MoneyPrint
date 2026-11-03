@@ -13,7 +13,7 @@ off, les sous-titres et la musique, puis sort un MP4.
 |---|---|---|
 | Écriture du script | Google **Gemini** (`gemini-3.5-flash`) | gratuit (clé Google AI Studio) |
 | Vidéos d'illustration | **Pixabay** | gratuit (clé Pixabay) |
-| Voix off française | **Edge TTS** (Denise ou Henri) | gratuit, sans clé |
+| Voix off | **Gemini TTS** (Kore ou Charon) | gratuit (même clé Gemini) |
 | Montage, sous-titres, musique | **MoneyPrinterTurbo** | gratuit |
 
 ## Mise en place (une seule fois)
@@ -33,11 +33,8 @@ barre de titre de la session, puis **Edit** → **Network access**. Ajoute ces
 domaines dans **Allowed domains** :
 
 ```
-api.pexels.com
-videos.pexels.com
 pixabay.com
 cdn.pixabay.com
-speech.platform.bing.com
 generativelanguage.googleapis.com
 github.com
 raw.githubusercontent.com
@@ -74,7 +71,8 @@ minutes la première fois dans une session), génère la vidéo et te l'envoie.
 Options :
 
 ```bash
-VOIX=homme ./video.sh "L'histoire du café"          # voix d'homme (Henri)
+VOIX=homme ./video.sh "L'histoire du café"          # voix d'homme (Charon)
+VOIX=gemini:Puck-Upbeat ./video.sh "Le sport"      # autre voix Gemini
 FORMAT=16:9 ./video.sh "Les volcans"                # horizontal (YouTube)
 FORMAT=1:1 ./video.sh "Les volcans"                 # carré
 ./video.sh "Les volcans" --paragraph-number 3       # script plus long (1 à 10)
@@ -100,3 +98,5 @@ est ignoré par git, pour ne pas alourdir le dépôt.
 - **Erreur 503 « high demand » de Gemini** : le modèle est surchargé. Réessaie plus tard ou change de modèle : `GEMINI_MODEL=gemini-3.8-flash ./video.sh "..."`.
 - **Erreur réseau / 403 du proxy** : un domaine manque dans la liste de l'étape 2.
 - **Pexels** : les inscriptions à l'API Pexels sont fermées, d'où l'utilisation de Pixabay à la place.
+- **Edge TTS** (la voix gratuite par défaut de MoneyPrinterTurbo) ne marche pas dans le cloud : elle passe par des WebSockets, que le proxy réseau bloque. On utilise donc Gemini TTS. Sur ton PC, Edge marche : `VOIX=fr-FR-DeniseNeural-Female ./video.sh "..."`.
+- **Variables d'environnement** : elles sont chargées au démarrage de la session. Après une modification, ouvre une nouvelle session.

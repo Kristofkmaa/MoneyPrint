@@ -16,16 +16,20 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 MPT_DIR="${MPT_DIR:-$HOME/MoneyPrinterTurbo}"
 OUT_DIR="${OUT_DIR:-$HERE/videos}"
 
+# Voix Gemini TTS (gratuite avec la clé Gemini). Edge TTS ne marche pas dans
+# le cloud : il utilise des WebSockets, que le proxy réseau ne laisse pas passer.
 case "${VOIX:-femme}" in
-  homme) VOICE="fr-FR-HenriNeural-Male" ;;
-  *)     VOICE="fr-FR-DeniseNeural-Female" ;;
+  homme) VOICE="gemini:Charon-Informative" ;;
+  femme) VOICE="gemini:Kore-Firm" ;;
+  *)     VOICE="$VOIX" ;;   # nom de voix complet, ex. gemini:Puck-Upbeat
 esac
 FORMAT="${FORMAT:-9:16}"
 
 # Installe / configure si besoin (rapide si déjà fait)
 "$HERE/setup.sh"
 
-TASK_ID="video-$(date +%Y%m%d-%H%M%S)"
+TASK_ID="$(python3 -c 'import uuid; print(uuid.uuid4())')"
+NOM="video-$(date +%Y%m%d-%H%M%S)"
 cd "$MPT_DIR"
 .venv/bin/python cli.py \
   --video-subject "$SUJET" \
@@ -41,7 +45,7 @@ n=0
 for f in storage/tasks/"$TASK_ID"/final-*.mp4; do
   [ -s "$f" ] || continue
   n=$((n+1))
-  dest="$OUT_DIR/${TASK_ID}-${n}.mp4"
+  dest="$OUT_DIR/${NOM}-${n}.mp4"
   cp "$f" "$dest"
   echo "VIDEO_FILE=$dest"
 done
