@@ -23,14 +23,37 @@ case "${VOIX:-femme}" in
   femme) VOICE="gemini:Kore-Firm" ;;
   *)     VOICE="$VOIX" ;;   # nom de voix complet, ex. gemini:Puck-Upbeat
 esac
-FORMAT="${FORMAT:-9:16}"
-
 # Installe / configure si besoin (rapide si déjà fait)
 "$HERE/setup.sh"
 
+FORMAT="${FORMAT:-9:16}"
+case "$FORMAT" in
+  16:9) W=1920; H=1080 ;;
+  1:1)  W=1080; H=1080 ;;
+  *)    W=1080; H=1920 ;;
+esac
+
+# Musique d'ambiance : AMBIANCE=suspense | calme | aucune | auto (piste au hasard de MoneyPrinterTurbo)
+MUSIQUE_ARGS=()
+case "${AMBIANCE:-auto}" in
+  suspense|calme)
+    BGM="$MPT_DIR/storage/ambiance-${AMBIANCE}.mp3"
+    if [ ! -s "$BGM" ]; then
+      mkdir -p "$(dirname "$BGM")"
+      "$MPT_DIR/.venv/bin/python" "$HERE/tools/ambiance.py" "$AMBIANCE" "/tmp/ambiance-$$.wav"
+      ffmpeg -v error -y -i "/tmp/ambiance-$$.wav" -b:a 192k "$BGM" && rm -f "/tmp/ambiance-$$.wav"
+    fi
+    MUSIQUE_ARGS=(--bgm-type custom --bgm-file "$BGM" --bgm-volume "${VOLUME_MUSIQUE:-0.35}") ;;
+  aucune) MUSIQUE_ARGS=(--bgm-type none) ;;
+esac
+
 TASK_ID="$(python3 -c 'import uuid; print(uuid.uuid4())')"
 NOM="video-$(date +%Y%m%d-%H%M%S)"
+TASK_DIR="$MPT_DIR/storage/tasks/$TASK_ID"
 cd "$MPT_DIR"
+# Les sous-titres de MoneyPrinterTurbo sont désactivés : leur minutage est
+# estimé et se décale avec Gemini TTS. On les ajoute nous-mêmes juste après,
+# calés sur les vraies pauses de la voix (tools/sync_subs.py).
 .venv/bin/python cli.py \
   --video-subject "$SUJET" \
   --video-language fr-FR \
@@ -38,15 +61,28 @@ cd "$MPT_DIR"
   --video-aspect "$FORMAT" \
   --voice-name "$VOICE" \
   --task-id "$TASK_ID" \
-  "$@"
+  "${MUSIQUE_ARGS[@]}" \
+  "$@" \
+  --no-subtitle-enabled
+
+SOUS_TITRES="$TASK_DIR/sous-titres.ass"
+if [ "${SANS_SOUS_TITRES:-0}" != "1" ]; then
+  .venv/bin/python "$HERE/tools/sync_subs.py" "$TASK_DIR" "$SOUS_TITRES" --width "$W" --height "$H"
+fi
 
 mkdir -p "$OUT_DIR"
 n=0
-for f in storage/tasks/"$TASK_ID"/final-*.mp4; do
+for f in "$TASK_DIR"/final-*.mp4; do
   [ -s "$f" ] || continue
   n=$((n+1))
   dest="$OUT_DIR/${NOM}-${n}.mp4"
-  cp "$f" "$dest"
+  if [ -s "$SOUS_TITRES" ]; then
+    ffmpeg -v error -y -i "$f" \
+      -vf "ass=$SOUS_TITRES:fontsdir=$MPT_DIR/resource/fonts" \
+      -c:v libx264 -preset medium -crf 20 -c:a copy -movflags +faststart "$dest"
+  else
+    cp "$f" "$dest"
+  fi
   echo "VIDEO_FILE=$dest"
 done
-[ "$n" -gt 0 ] || { echo "❌ Aucune vidéo produite (voir storage/tasks/$TASK_ID)" >&2; exit 1; }
+[ "$n" -gt 0 ] || { echo "❌ Aucune vidéo produite (voir $TASK_DIR)" >&2; exit 1; }

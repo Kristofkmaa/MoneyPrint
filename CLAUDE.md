@@ -10,6 +10,14 @@ MoneyPrinterTurbo (voir README.md).
    MoneyPrinterTurbo tout seul si besoin.
    - Voix d'homme : `VOIX=homme` ; format horizontal : `FORMAT=16:9` ; carré : `FORMAT=1:1`.
    - Vidéo plus longue : ajoute `--paragraph-number N` (1 à 10).
+   - Musique : `AMBIANCE=suspense` (true crime, mystère, horreur), `AMBIANCE=calme`
+     (bien-être, nature), `AMBIANCE=aucune`. Choisis-la selon le sujet si
+     l'utilisateur ne précise rien.
+   - Si le sujet a un mot ambigu pour les banques d'images (ex. « Zodiac » →
+     astrologie), impose des mots-clés anglais concrets avec
+     `--video-terms "police car night,old newspaper,..."`.
+   - Les sous-titres sont calés automatiquement sur la voix (tools/sync_subs.py) ;
+     ne réactive pas ceux de MoneyPrinterTurbo.
 2. Récupère la ligne `VIDEO_FILE=...` et envoie le fichier à l'utilisateur
    avec `SendUserFile` (display: render).
 3. Ne commit **jamais** de vidéo ni de clé API.

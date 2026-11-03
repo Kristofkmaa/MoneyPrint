@@ -73,12 +73,15 @@ Options :
 ```bash
 VOIX=homme ./video.sh "L'histoire du café"          # voix d'homme (Charon)
 VOIX=gemini:Puck-Upbeat ./video.sh "Le sport"      # autre voix Gemini
+AMBIANCE=suspense ./video.sh "Le Dahlia noir"       # musique suspense (true crime, mystère)
+AMBIANCE=calme ./video.sh "Bien dormir"             # musique douce
+AMBIANCE=aucune ./video.sh "Les volcans"            # sans musique
 FORMAT=16:9 ./video.sh "Les volcans"                # horizontal (YouTube)
 FORMAT=1:1 ./video.sh "Les volcans"                 # carré
 ./video.sh "Les volcans" --paragraph-number 3       # script plus long (1 à 10)
 ./video.sh "Les volcans" --video-count 3            # 3 variantes d'un coup
-./video.sh "Les volcans" --no-subtitle-enabled      # sans sous-titres
-./video.sh "Les volcans" --bgm-type none            # sans musique
+SANS_SOUS_TITRES=1 ./video.sh "Les volcans"        # sans sous-titres
+./video.sh "Zodiac" --video-terms "police car night,old newspaper"   # imposer les images
 ```
 
 Toutes les options : `cd ~/MoneyPrinterTurbo && .venv/bin/python cli.py --help`
@@ -90,6 +93,8 @@ est ignoré par git, pour ne pas alourdir le dépôt.
 
 - `setup.sh` : installe MoneyPrinterTurbo dans `~/MoneyPrinterTurbo` et écrit sa configuration à partir des variables d'environnement. Tu peux le relancer sans risque.
 - `video.sh` : génère une vidéo à partir d'un sujet (lance `setup.sh` au besoin).
+- `tools/sync_subs.py` : cale les sous-titres sur les vraies pauses de la voix (texte identique au script).
+- `tools/ambiance.py` : compose une musique d'ambiance libre de droits (`suspense` ou `calme`).
 - `CLAUDE.md` : les instructions que Claude suit dans chaque nouvelle session.
 
 ## Dépannage
