@@ -37,7 +37,7 @@ esac
 MUSIQUE_ARGS=()
 case "${AMBIANCE:-auto}" in
   suspense|calme)
-    BGM="$MPT_DIR/storage/ambiance-${AMBIANCE}.mp3"
+    BGM="$MPT_DIR/storage/bgm/ambiance-${AMBIANCE}.mp3"
     if [ ! -s "$BGM" ]; then
       mkdir -p "$(dirname "$BGM")"
       "$MPT_DIR/.venv/bin/python" "$HERE/tools/ambiance.py" "$AMBIANCE" "/tmp/ambiance-$$.wav"
@@ -76,9 +76,14 @@ for f in "$TASK_DIR"/final-*.mp4; do
   [ -s "$f" ] || continue
   n=$((n+1))
   dest="$OUT_DIR/${NOM}-${n}.mp4"
-  if [ -s "$SOUS_TITRES" ]; then
+  FILTRES=()
+  # Ambiance suspense : image plus sombre et désaturée + vignette
+  [ "${AMBIANCE:-auto}" = "suspense" ] && FILTRES+=("eq=saturation=0.45:brightness=-0.06:contrast=1.12,vignette=PI/4.5")
+  [ -s "$SOUS_TITRES" ] && FILTRES+=("ass=$SOUS_TITRES:fontsdir=$MPT_DIR/resource/fonts")
+  if [ ${#FILTRES[@]} -gt 0 ]; then
+    VF=$(IFS=,; echo "${FILTRES[*]}")
     ffmpeg -v error -y -i "$f" \
-      -vf "ass=$SOUS_TITRES:fontsdir=$MPT_DIR/resource/fonts" \
+      -vf "$VF" \
       -c:v libx264 -preset medium -crf 20 -c:a copy -movflags +faststart "$dest"
   else
     cp "$f" "$dest"
