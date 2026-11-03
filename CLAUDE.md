@@ -18,6 +18,12 @@ MoneyPrinterTurbo (voir README.md).
      `--video-terms "police car night,old newspaper,..."`.
    - Les sous-titres sont calés automatiquement sur la voix (tools/sync_subs.py) ;
      ne réactive pas ceux de MoneyPrinterTurbo.
+   - Montage par défaut `MONTAGE=precis` (tools/storyboard.py) : Gemini choisit une
+     image Pixabay par phrase dite, coupée pile sur la voix. Le log `[storyboard]`
+     donne une note /10 par plan : signale à l'utilisateur les plans notés < 6.
+     `MONTAGE=rapide` = montage d'origine (plus rapide, moins précis).
+   - Quand l'utilisateur donne des consignes précises de contenu, écris toi-même le
+     texte (faits vérifiés) et passe-le avec `--video-script "..."`.
 2. Récupère la ligne `VIDEO_FILE=...` et envoie le fichier à l'utilisateur
    avec `SendUserFile` (display: render).
 3. Ne commit **jamais** de vidéo ni de clé API.

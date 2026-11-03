@@ -78,13 +78,18 @@ Tiens compte du contexte des phrases voisines (un « elle » désigne ce dont on
 Pour l'accroche ou la conclusion, choisis une image forte liée au thème général.
 Évite les noms propres que la banque ne connaît pas ; décris l'objet visible.
 
-Réponds en JSON : {{"plans": [{{"i": 0, "voir": "description courte en français", "recherches": ["...", "...", "..."]}}, ...]}}"""
+Ajoute pour chaque plan une recherche de « secours » : un visuel générique du
+thème qui existe forcément en banque d'images et reste cohérent avec la phrase
+(ex. « astronaut space station » pour une phrase sur la vie dans l'espace).
+
+Réponds en JSON : {{"plans": [{{"i": 0, "voir": "description courte en français", "recherches": ["...", "...", "..."], "secours": "..."}}, ...]}}"""
     data = json.loads(gemini([{"text": prompt}]))
     by_i = {p["i"]: p for p in data["plans"]}
     for i, s in enumerate(shots):
         p = by_i.get(i, {})
         s["voir"] = p.get("voir", s["text"])
         s["queries"] = [q for q in p.get("recherches", []) if q][:3] or [s["text"]]
+        s["secours"] = p.get("secours") or s["queries"][-1]
 
 
 # --------------------------------------------------------------------------- Pixabay
@@ -265,6 +270,12 @@ def main() -> None:
             tried = used | {c["id"] for c in cands}
             alt = choose(sh, candidates_for(sh, tried, orientation, photos_first=True), work)
             if alt is not None and _note(alt) > _note(pick):
+                pick = alt
+        if pick is not None and _note(pick) < 5:
+            # Dernier recours : un visuel générique du thème plutôt qu'une image hors sujet
+            safe = {**sh, "queries": [sh["secours"]]}
+            alt = choose(safe, candidates_for(safe, used, orientation), work)
+            if alt is not None and _note(alt) >= _note(pick):
                 pick = alt
         if pick is None:
             raise SystemExit(f"Aucun visuel trouvé pour : {sh['text']}")

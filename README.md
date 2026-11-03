@@ -94,6 +94,7 @@ est ignoré par git, pour ne pas alourdir le dépôt.
 - `setup.sh` : installe MoneyPrinterTurbo dans `~/MoneyPrinterTurbo` et écrit sa configuration à partir des variables d'environnement. Tu peux le relancer sans risque.
 - `video.sh` : génère une vidéo à partir d'un sujet (lance `setup.sh` au besoin).
 - `tools/sync_subs.py` : cale les sous-titres sur les vraies pauses de la voix (texte identique au script).
+- `tools/storyboard.py` : montage précis, une image par phrase choisie par Gemini (qui regarde les miniatures Pixabay), coupée pile sur la voix. Désactivable avec `MONTAGE=rapide`.
 - `tools/ambiance.py` : compose une musique d'ambiance libre de droits (`suspense` ou `calme`).
 - `CLAUDE.md` : les instructions que Claude suit dans chaque nouvelle session.
 

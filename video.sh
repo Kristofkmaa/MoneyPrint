@@ -51,6 +51,36 @@ TASK_ID="$(python3 -c 'import uuid; print(uuid.uuid4())')"
 NOM="video-$(date +%Y%m%d-%H%M%S)"
 TASK_DIR="$MPT_DIR/storage/tasks/$TASK_ID"
 cd "$MPT_DIR"
+
+# MONTAGE=precis (défaut) : une image choisie par Gemini pour chaque phrase dite,
+# coupée pile sur la voix (tools/storyboard.py). MONTAGE=rapide : montage
+# d'origine de MoneyPrinterTurbo (plus rapide, images moins précises).
+if [ "${MONTAGE:-precis}" = "precis" ]; then
+  .venv/bin/python cli.py \
+    --video-subject "$SUJET" \
+    --video-language fr-FR \
+    --video-source pixabay \
+    --video-aspect "$FORMAT" \
+    --voice-name "$VOICE" \
+    --task-id "$TASK_ID" \
+    "$@" \
+    --stop-at audio
+  case "${AMBIANCE:-auto}" in
+    suspense|calme) MUSIQUE="$BGM" ;;
+    aucune)         MUSIQUE="" ;;
+    *)              MUSIQUE="$(ls resource/songs/*.mp3 | shuf -n 1)" ;;
+  esac
+  SB_ARGS=(--format "$FORMAT" --volume-musique "${VOLUME_MUSIQUE:-0.3}")
+  [ -n "$MUSIQUE" ] && SB_ARGS+=(--musique "$MUSIQUE")
+  [ "${AMBIANCE:-auto}" = "suspense" ] && SB_ARGS+=(--suspense)
+  [ "${SANS_SOUS_TITRES:-0}" = "1" ] && SB_ARGS+=(--sans-sous-titres)
+  mkdir -p "$OUT_DIR"
+  dest="$OUT_DIR/${NOM}-1.mp4"
+  .venv/bin/python "$HERE/tools/storyboard.py" "$TASK_DIR" "$dest" "${SB_ARGS[@]}"
+  echo "VIDEO_FILE=$dest"
+  exit 0
+fi
+
 # Les sous-titres de MoneyPrinterTurbo sont désactivés : leur minutage est
 # estimé et se décale avec Gemini TTS. On les ajoute nous-mêmes juste après,
 # calés sur les vraies pauses de la voix (tools/sync_subs.py).
